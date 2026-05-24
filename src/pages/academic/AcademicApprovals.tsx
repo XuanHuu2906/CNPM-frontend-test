@@ -84,7 +84,7 @@ export default function AcademicApprovals() {
       const mapped: ClassApproval[] = classesData.map((cls: any) => {
         // Lọc bài nộp thuộc lớp này
         const classSubs = subsData.filter((sub: any) => {
-          const sClassId = sub.student?.classId || sub.group?.classId;
+          const sClassId = sub.group?.classId || (sub.student?.enrollments?.some((e: any) => e.classId === cls.id) ? cls.id : null);
           return sClassId === cls.id;
         });
 
@@ -95,14 +95,21 @@ export default function AcademicApprovals() {
             ? (sub.group.students?.map((s: any) => s.user?.fullName) || [])
             : [sub.student?.user?.fullName || 'N/A'];
 
-          const grade = sub.grade;
+          const grade = sub.grades && sub.grades.length > 0 ? sub.grades[0] : null;
           const isApproved = grade?.isApproved || false;
           // Trạng thái: HOAN_THANH (PDT đã duyệt), CHO_DUYET (GV đã chấm, chờ duyệt), DANG_CHAM (chưa chấm hoặc bị trả về)
           const status: 'DANG_CHAM' | 'CHO_DUYET' | 'HOAN_THANH' = isApproved ? 'HOAN_THANH' : (grade ? 'CHO_DUYET' : 'DANG_CHAM');
 
           // Đọc phân rã Rubric từ detailedScores
           const rubricBreakdown = grade?.rubric?.criteria?.map((crit: any) => {
-            const detailedScores = grade.detailedScores || [];
+            let detailedScores = grade.detailedScores || [];
+            if (typeof detailedScores === 'string') {
+              try {
+                detailedScores = JSON.parse(detailedScores);
+              } catch (e) {
+                detailedScores = [];
+              }
+            }
             const critScoreObj = detailedScores.find((ds: any) => ds.criteriaId === crit.id);
             return {
               name: crit.criteriaName,
@@ -117,7 +124,7 @@ export default function AcademicApprovals() {
             groupName,
             topicName,
             members,
-            score: grade ? grade.finalScore : null,
+            score: grade && grade.finalScore != null ? Number(grade.finalScore) : null,
             plagiarismRate: sub.plagiarismRate || 0,
             comments: grade?.feedback || '',
             status,

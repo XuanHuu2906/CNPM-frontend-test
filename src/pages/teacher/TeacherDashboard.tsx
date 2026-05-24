@@ -95,13 +95,13 @@ export default function TeacherDashboard() {
       members = (sub.group.members || sub.group.students || []).map(
         (m: any) => {
           const s = m.student || m;
-          return `${s.user.fullName} (MSSV: ${s.studentCode || s.user?.student?.studentCode || ''})`;
+          return `${s?.user?.fullName || 'Chưa có tên'} (MSSV: ${s?.studentCode || s?.user?.student?.studentCode || 'N/A'})`;
         }
       );
     } else if (sub.student) {
-      name = `Cá nhân: ${sub.student.user.fullName}`;
+      name = `Cá nhân: ${sub.student?.user?.fullName || 'Chưa có tên'}`;
       topic = 'Báo cáo cá nhân';
-      members = [`${sub.student.user.fullName} (MSSV: ${sub.student.studentCode || sub.student.user?.student?.studentCode || ''})`];
+      members = [`${sub.student?.user?.fullName || 'Chưa có tên'} (MSSV: ${sub.student?.studentCode || sub.student?.user?.student?.studentCode || 'N/A'})`];
     }
 
     const score = sub.grades && sub.grades.length > 0 ? Number(sub.grades[0].finalScore) : null;
@@ -169,9 +169,9 @@ export default function TeacherDashboard() {
 
   // Lọc dữ liệu dựa trên ô tìm kiếm & Bộ lọc trạng thái
   const filteredGroups = mappedGroups.filter(g => {
-    const matchesSearch = g.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      g.groupName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      g.members.some(m => m.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesSearch = (g.topic || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (g.groupName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      g.members.some((m: string) => (m || '').toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesStatus = statusFilter === 'ALL' || g.status === statusFilter;
 

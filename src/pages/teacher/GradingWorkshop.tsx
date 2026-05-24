@@ -401,7 +401,7 @@ export default function GradingWorkshop() {
                 <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm mt-4">Tệp đính kèm phụ (Attachments):</h3>
                 {submission?.attachments && submission.attachments.length > 0 ? (
                   <div className="grid grid-cols-1 gap-2 mt-2">
-                    {submission.attachments.split(',').filter(Boolean).map((att, idx) => (
+                    {(Array.isArray(submission.attachments) ? submission.attachments : String(submission.attachments).split(',')).filter(Boolean).map((att: string, idx: number) => (
                       <a
                         key={idx}
                         href={getFileUrl(att)}

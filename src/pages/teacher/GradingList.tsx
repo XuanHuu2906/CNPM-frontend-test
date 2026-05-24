@@ -124,8 +124,8 @@ export default function GradingList() {
   };
 
   const filteredGroups = mappedGroups.filter(g => {
-    const matchesSearch = g.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      g.groupName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (g.topic || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (g.groupName || '').toLowerCase().includes(searchQuery.toLowerCase());
 
     let matchesStatus = false;
     if (statusFilter === 'HIDE_CHUA_NOP') {
